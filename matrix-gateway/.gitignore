@@ -1,2 +1,6 @@
 # rust
 target
+
+# matrix-gateway
+.client.yaml
+.users.json
