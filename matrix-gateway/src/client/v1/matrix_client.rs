@@ -23,6 +23,10 @@ impl From<AppState> for MatrixClient
 
 impl MatrixClient
 {
+    pub async fn login(&self) -> ()
+    {
+    }
+
     pub async fn send_message(&self, message: &ChatRoomMessage) -> ()
     {
         let uri = Uri::builder()
