@@ -1,18 +1,18 @@
-use super::IdentifierType;
+use super::AuthenticationType;
 use serde::{Deserialize};
 
 #[derive(Debug, Deserialize)]
 pub struct Flow
 {
     #[serde(rename = "type")]
-    pub identifier_type: IdentifierType,
+    pub authentication_type: AuthenticationType,
 }
 
 #[cfg(test)]
 mod test
 {
     use super::Flow;
-    use super::IdentifierType;
+    use super::AuthenticationType;
 
     #[test]
     fn flow_deserializes_from_json()
@@ -26,6 +26,6 @@ mod test
         assert!(flow.is_ok());
 
         let flow: Flow = flow.unwrap();
-        assert_eq!(IdentifierType::User, flow.identifier_type);
+        assert_eq!(AuthenticationType::Password, flow.authentication_type);
     }
 }
