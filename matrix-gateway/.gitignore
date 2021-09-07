@@ -2,5 +2,5 @@
 target
 
 # matrix-gateway
-.client.yaml
+.client.json
 .users.json

@@ -1,91 +1,68 @@
+use std::convert::TryFrom;
 use crate::web::AppState;
 use actix_web::client::Client;
 use actix_web::http::Uri;
 use actix_web::http::uri::Scheme;
 use crate::model::ChatRoomMessage;
 use super::text_message::{TextMessage, TextMessageContent, Unsigned};
+use super::ClientConfig;
+use super::model::{Flow, FlowCollection};
+use actix_web::http;
+use std::collections::HashMap;
 
-struct MatrixClient
+pub struct MatrixClient
 {
-    base_uri: Uri,
+    internal: ClientConfig,
     http_client: Client,
-}
-
-impl From<AppState> for MatrixClient
-{
-    fn from(app_state: AppState) -> Self {
-        MatrixClient {
-            base_uri: Uri::from_static("https://matrix.allyourcoinsarebelongtous.xyz"),
-            http_client: app_state.http_client
-        }
-    }
 }
 
 impl MatrixClient
 {
-    pub async fn login(&self) -> ()
+    pub fn new(config: ClientConfig, client: Client) -> Self
     {
+        Self {
+            internal: config,
+            http_client: client
+        }
     }
 
-    pub async fn send_message(&self, message: &ChatRoomMessage) -> ()
+    pub async fn get_login(&self) -> Vec<Flow>
     {
         let uri = Uri::builder()
             .scheme(Scheme::HTTPS)
-            .authority("matrix.allyourcoinsarebelongtous.xyz")
-            .path_and_query(format!("/_matrix/client/r0/rooms/{0}/m.room.member/{1}"
-                                    , message.room
-                                    , message.user))
+            .authority(self.internal.authority.as_str())
+            .path_and_query(format!("{0}/login", &self.internal.client_api))
             .build()
             .unwrap();
 
-        let client_msg = TextMessage {
-            content: TextMessageContent {
-                body: message.body.clone(),
-                format: String::from("org.matrix.custom.html"),
-                formatted_body: message.body.clone(),
-                msgtype: String::from("m.text"),
-            },
-            event_id: format!("$143273582443PhrSn:{0}", "matrix.allyourcoinsarebelongtous.xyz"),
-            origin_server_ts: String::from(""),
-            room_id: String::from(""),
-            sender: format!("{0}:{1}", message.user, "matrix.allyourcoinsarebelongtous.xyz"),
-            message_type: String::from("m.room.message"),
-            unsigned: Unsigned {
-                age: 1234,
-            },
-        };
-
-        let response = self.http_client.put(uri)
-            .send_json(&client_msg)
+        let mut response = self.http_client.get(uri)
+            .send()
             .await
             .unwrap();
 
-        println!("Status: {0}", response.status())
+        let bytes = response.body().await.unwrap();
+        let flows: FlowCollection = serde_json::from_slice(&*bytes).unwrap();
+        flows.flows
     }
 }
 
 #[cfg(test)]
 mod test
 {
+    use std::fs;
     use super::*;
 
     #[actix_rt::test]
     async fn foo() -> ()
     {
+        let config = fs::read_to_string(".client.json").unwrap();
+        let config = ClientConfig::try_from(config.as_str()).unwrap();
+
         let client = Client::default();
 
-        let matrix = MatrixClient::from(AppState
-        {
-            http_client: client,
-        });
+        let matrix = MatrixClient::new(config, client);
+        let x = matrix.get_login().await;
 
-        let msg = ChatRoomMessage
-        {
-            room: String::from("!pmjmYCrjwQDuSGOOtn"),
-            user: String::from("white_james"),
-            body: String::from("message from api"),
-        };
-
-        matrix.send_message(&msg).await
+        println!("{:?}", x);
     }
 }

@@ -19,4 +19,6 @@ pub enum AuthenticationType
     Token,
     #[serde(rename = "m.login.dummy")]
     Dummy,
+    #[serde(other)]
+    Other
 }

@@ -8,6 +8,12 @@ pub struct Flow
     pub authentication_type: AuthenticationType,
 }
 
+#[derive(Deserialize)]
+pub struct FlowCollection
+{
+    pub flows: Vec<Flow>,
+}
+
 #[cfg(test)]
 mod test
 {
