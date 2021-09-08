@@ -2,6 +2,8 @@ use std::convert::TryFrom;
 use actix_web::http::Uri;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Read;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ClientConfig
@@ -18,6 +20,19 @@ impl TryFrom<&str> for ClientConfig
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         serde_json::from_str(value)
+    }
+}
+
+impl TryFrom<&std::path::Path> for ClientConfig
+{
+    type Error = serde_json::Error;
+
+    fn try_from(path: &std::path::Path) -> Result<Self, Self::Error> {
+        let content = std::fs::read_to_string(path)
+            .unwrap_or_else(|e|{
+                panic!("Invalid file: {:?}", path);
+            });
+        serde_json::from_str(content.as_str())
     }
 }
 

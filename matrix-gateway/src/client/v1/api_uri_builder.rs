@@ -3,14 +3,14 @@ use std::str::FromStr;
 use actix_web::http::{Error, Uri};
 use actix_web::http::uri::{Scheme};
 
-struct ApiUriBuilder
+pub struct ApiUriBuilder
 {
     base_uri: String,
 }
 
 impl ApiUriBuilder
 {
-    fn new(authority: &str, api_prefix: &str) -> Result<Self, Error>
+    pub fn new(authority: &str, api_prefix: &str) -> Result<Self, Error>
     {
         let base_uri: String = Uri::builder()
             .scheme(Scheme::HTTPS)
@@ -23,14 +23,14 @@ impl ApiUriBuilder
         })
     }
 
-    fn login(&self) -> Uri
+    pub fn login(&self) -> Uri
     {
         let uri = format!("{}/login", self.base_uri.as_str());
         Uri::from_str(uri.as_str()).unwrap()
     }
 
     // "/_matrix/client/r0/rooms/{ROOM_ID}/send/{ROOM_EVENT}?access_token={ACCESS_TOKEN}"
-    fn send(&self, room_id: &str, room_event: RoomEventType, access_token: &str) -> Uri
+    pub fn send(&self, room_id: &str, room_event: RoomEventType, access_token: &str) -> Uri
     {
         let uri = format!("{}/rooms/{}/send/{}?access_token={}"
             , self.base_uri.as_str()

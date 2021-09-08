@@ -1,58 +1,30 @@
-use std::convert::TryFrom;
-use crate::web::AppState;
 use actix_web::client::Client;
 use actix_web::http::Uri;
-use actix_web::http::uri::Scheme;
-use crate::model::ChatRoomMessage;
-use super::text_message::{TextMessage, TextMessageContent, Unsigned};
-use super::ClientConfig;
+use super::{ClientConfig, ApiUriBuilder};
 use super::model::{Flow, FlowCollection, LoginResponse, LoginRequest};
 use actix_web::http;
 use std::collections::HashMap;
 
 pub struct MatrixClient
 {
-    internal: ClientConfig,
+    api_uri: ApiUriBuilder,
     http_client: Client,
-    api: Api,
-}
-
-struct Api
-{
-    login: Uri,
-}
-
-impl TryFrom<&ClientConfig> for Api
-{
-    type Error = http::Error;
-
-    fn try_from(config: &ClientConfig) -> Result<Self, Self::Error> {
-        let uri_builder = Uri::builder()
-            .scheme(Scheme::HTTPS)
-            .authority(config.authority.as_str());
-
-        Ok(Self {
-            login: uri_builder
-                .path_and_query(format!("{0}/login", config.client_api.as_str()))
-                .build()?
-        })
-    }
 }
 
 impl MatrixClient
 {
-    pub fn new(config: ClientConfig, client: Client) -> Result<Self,http::Error>
+    pub fn new(api_uri: ApiUriBuilder, http_client: Client) -> Self
     {
-        Ok(Self {
-            http_client: client,
-            api: Api::try_from(&config)?,
-            internal: config,
-        })
+        Self {
+            api_uri,
+            http_client,
+        }
     }
 
     pub async fn get_login(&self) -> Vec<Flow>
     {
-        let mut response = self.http_client.get(&self.api.login)
+        let mut response = self.http_client
+            .get(&self.api_uri.login())
             .send()
             .await
             .unwrap();
@@ -64,7 +36,8 @@ impl MatrixClient
 
     pub async fn post_login(&self, req: &LoginRequest) -> LoginResponse
     {
-        let mut response = self.http_client.post(&self.api.login)
+        let mut response = self.http_client
+            .post(&self.api_uri.login())
             .send_json(req)
             .await
             .unwrap();
@@ -82,6 +55,7 @@ mod test
     use crate::model::UserCredential;
     use crate::client::v1::model::{AuthenticationType, LoginIdentifier, IdentifierType};
 
+    /*
     #[actix_rt::test]
     async fn foo() -> ()
     {
@@ -123,5 +97,5 @@ mod test
         let res = matrix.post_login(&req).await;
 
         println!("{:?}", res);
-    }
+    }*/
 }
