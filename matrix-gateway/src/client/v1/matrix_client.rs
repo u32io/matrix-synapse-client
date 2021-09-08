@@ -22,22 +22,32 @@ struct Api
     login: Uri,
 }
 
+impl TryFrom<&ClientConfig> for Api
+{
+    type Error = http::Error;
+
+    fn try_from(config: &ClientConfig) -> Result<Self, Self::Error> {
+        let uri_builder = Uri::builder()
+            .scheme(Scheme::HTTPS)
+            .authority(config.authority.as_str());
+
+        Ok(Self {
+            login: uri_builder
+                .path_and_query(format!("{0}/login", config.client_api.as_str()))
+                .build()?
+        })
+    }
+}
+
 impl MatrixClient
 {
-    pub fn new(config: ClientConfig, client: Client) -> Self
+    pub fn new(config: ClientConfig, client: Client) -> Result<Self,http::Error>
     {
-        Self {
+        Ok(Self {
             http_client: client,
-            api: Api {
-                login: Uri::builder()
-                    .scheme(Scheme::HTTPS)
-                    .authority(config.authority.as_str())
-                    .path_and_query(format!("{0}/login", config.client_api.as_str()))
-                    .build()
-                    .unwrap(),
-            },
+            api: Api::try_from(&config)?,
             internal: config,
-        }
+        })
     }
 
     pub async fn get_login(&self) -> Vec<Flow>
@@ -80,7 +90,7 @@ mod test
 
         let client = Client::default();
 
-        let matrix = MatrixClient::new(config, client);
+        let matrix = MatrixClient::new(config, client).unwrap();
         let x = matrix.get_login().await;
 
         println!("{:?}", x);
@@ -94,7 +104,7 @@ mod test
 
         let client = Client::default();
 
-        let matrix = MatrixClient::new(config, client);
+        let matrix = MatrixClient::new(config, client).unwrap();
 
         let users = fs::read_to_string(".users.json").unwrap();
         let users: Vec<UserCredential> = serde_json::from_str(users.as_str()).unwrap();

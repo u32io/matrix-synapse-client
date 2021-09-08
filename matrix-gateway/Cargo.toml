@@ -11,5 +11,5 @@ actix-web = { version = "3", features = ["openssl"] }
 actix-rt = "1"
 serde = "1"
 serde_json = "1"
-serde_yaml = "*"
 openssl = "*"
+lazy_static = "1.4.0"
