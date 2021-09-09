@@ -11,7 +11,6 @@ pub struct ClientConfig
     pub home_server: String,
     pub authority: String, // TODO: impl Deserialize for Uri
     pub client_api: String,
-    pub client_api_paths: HashMap<String,String>,
 }
 
 impl TryFrom<&str> for ClientConfig
@@ -48,10 +47,7 @@ mod test
             {
                 \"home_server\":\"homeserver\",
                 \"authority\":\"authority\",
-                \"client_api\":\"/_matrix/client/r0\",
-                \"client_api_paths\":{
-                    \"GET login\":\"/_matrix/client/r0/login\"
-                }
+                \"client_api\":\"/_matrix/client/r0\"
             }";
 
         let config = ClientConfig::try_from(json);
