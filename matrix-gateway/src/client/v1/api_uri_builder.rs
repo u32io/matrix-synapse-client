@@ -2,6 +2,7 @@ use super::model::RoomEventType;
 use std::str::FromStr;
 use actix_web::http::{Error, Uri};
 use actix_web::http::uri::{Scheme};
+use urlencoding::Encoded;
 
 pub struct ApiUriBuilder
 {
@@ -30,7 +31,7 @@ impl ApiUriBuilder
     }
 
     // "/_matrix/client/r0/rooms/{ROOM_ID}/send/{ROOM_EVENT}?access_token={ACCESS_TOKEN}"
-    pub fn send(&self, room_id: &str, room_event: RoomEventType, access_token: &str) -> Uri
+    pub fn send(&self, room_id: Encoded<&str>, room_event: RoomEventType, access_token: &str) -> Uri
     {
         let uri = format!("{}/rooms/{}/send/{}?access_token={}"
             , self.base_uri.as_str()

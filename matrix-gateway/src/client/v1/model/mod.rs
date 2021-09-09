@@ -20,6 +20,7 @@ pub use message_type::MessageType as MessageType;
 // Models
 pub use error_response::ErrorResponse as ErrorResponse;
 pub use event_response::EventResponse as EventResponse;
+pub use message_request::MessageRequest as MessageRequest;
 pub use flow::Flow as Flow;
 pub use flow::FlowCollection as FlowCollection;
 pub use login_request::LoginRequest as LoginRequest;

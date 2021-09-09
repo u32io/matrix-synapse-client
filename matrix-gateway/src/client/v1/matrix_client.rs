@@ -7,6 +7,8 @@ use actix_web::ResponseError;
 use serde::de::DeserializeOwned;
 use actix_web::web::Payload;
 use actix_web::dev::PayloadStream;
+use crate::client::v1::model::{MessageRequest, RoomEventType, EventResponse};
+use urlencoding::Encoded;
 
 // TODO: implement std::error::Error on this type
 pub enum MatrixClientError
@@ -91,7 +93,16 @@ impl MatrixClient
         try_convert_200!(response, LoginResponse)
     }
 
-    pub async fn post_message(&self, )
+    pub async fn post_message(&self
+        , msg: &MessageRequest
+        , room_id: Encoded<&str>
+        , access_token: &str) -> Result<EventResponse, MatrixClientError>
+    {
+        let mut response = http_post!(self.http_client
+            , self.api_uri.send(room_id, RoomEventType::Message, access_token)
+            , msg)?;
+        try_convert_200!(response, EventResponse)
+    }
 }
 
 #[cfg(test)]
