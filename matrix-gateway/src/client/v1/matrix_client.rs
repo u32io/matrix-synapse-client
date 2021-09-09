@@ -1,14 +1,72 @@
-use actix_web::client::Client;
-use actix_web::http::Uri;
+use actix_web::client::{Client, SendRequestError, PayloadError, ClientResponse};
+use actix_web::http::{Uri, Error, StatusCode};
 use super::{ClientConfig, ApiUriBuilder};
-use super::model::{Flow, FlowCollection, LoginResponse, LoginRequest};
-use actix_web::http;
+use super::model::{Flow, FlowCollection, LoginResponse, LoginRequest, ErrorResponse};
 use std::collections::HashMap;
+use actix_web::ResponseError;
+use serde::de::DeserializeOwned;
+use actix_web::web::Payload;
+use actix_web::dev::PayloadStream;
+
+// TODO: implement std::error::Error on this type
+pub enum MatrixClientError
+{
+    SendRequestError(SendRequestError),
+    PayloadErr(PayloadError),
+    JsonDeserializationError(serde_json::Error),
+    HttpResponseError(StatusCode, ErrorResponse),
+    Unknown,
+}
 
 pub struct MatrixClient
 {
     api_uri: ApiUriBuilder,
     http_client: Client,
+}
+
+macro_rules! http_get {
+    ($http_client:expr, $uri:expr) => {
+        $http_client
+        .get($uri)
+        .send()
+        .await
+        .map_err(|e| MatrixClientError::SendRequestError(e))
+    }
+}
+
+macro_rules! http_post {
+    ($http_client:expr, $uri:expr, $json:expr) => {
+        $http_client
+        .post($uri)
+        .send_json($json)
+        .await
+        .map_err(|e| MatrixClientError::SendRequestError(e))
+    }
+}
+
+macro_rules! get_json {
+    ($t:ty, $response:expr) => {
+        {
+            let bytes = $response.body()
+                .await
+                .map_err(|e| MatrixClientError::PayloadErr(e))?;
+
+            let json: Result<$t,MatrixClientError> = serde_json::from_slice(&*bytes)
+                .map_err(|e| MatrixClientError::JsonDeserializationError(e));
+            json
+        }
+    }
+}
+
+macro_rules! try_convert_200 {
+    ($http_response:expr, $model:ty) => {
+        match $http_response.status()
+        {
+            StatusCode::OK => Ok(get_json!($model, $http_response)?),
+            _ => Err(MatrixClientError::HttpResponseError($http_response.status()
+                , get_json!(ErrorResponse, $http_response)?))
+        }
+    }
 }
 
 impl MatrixClient
@@ -21,29 +79,16 @@ impl MatrixClient
         }
     }
 
-    pub async fn get_login(&self) -> Vec<Flow>
+    pub async fn get_login(&self) -> Result<FlowCollection, MatrixClientError>
     {
-        let mut response = self.http_client
-            .get(&self.api_uri.login())
-            .send()
-            .await
-            .unwrap();
-
-        let bytes = response.body().await.unwrap();
-        let flows: FlowCollection = serde_json::from_slice(&*bytes).unwrap();
-        flows.flows
+        let mut response = http_get!(self.http_client, self.api_uri.login())?;
+        try_convert_200!(response, FlowCollection)
     }
 
-    pub async fn post_login(&self, req: &LoginRequest) -> LoginResponse
+    pub async fn post_login(&self, req: &LoginRequest) -> Result<LoginResponse, MatrixClientError>
     {
-        let mut response = self.http_client
-            .post(&self.api_uri.login())
-            .send_json(req)
-            .await
-            .unwrap();
-
-        let bytes = response.body().await.unwrap();
-        serde_json::from_slice(&*bytes).unwrap()
+        let mut response = http_post!(self.http_client, self.api_uri.login(), req)?;
+        try_convert_200!(response, LoginResponse)
     }
 }
 

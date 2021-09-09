@@ -32,8 +32,11 @@ mod test
     {
         let matrix = init_matrix_client();
 
-        let mut flow = matrix.get_login().await;
+        let flow = matrix.get_login().await;
 
+        assert!(flow.is_ok());
+
+        let flow = flow.ok().unwrap().flows;
         assert!(flow.len() >= 1);
     }
 }
