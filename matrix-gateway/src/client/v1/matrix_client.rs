@@ -90,6 +90,8 @@ impl MatrixClient
         let mut response = http_post!(self.http_client, self.api_uri.login(), req)?;
         try_convert_200!(response, LoginResponse)
     }
+
+    pub async fn post_message(&self, )
 }
 
 #[cfg(test)]
