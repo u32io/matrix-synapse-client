@@ -929,10 +929,16 @@ version = "0.1.0"
 [[package]]
 name = "matrix-web-dto"
 version = "0.1.0"
+dependencies = [
+ "matrix-web-entity",
+]
 
 [[package]]
 name = "matrix-web-entity"
 version = "0.1.0"
+dependencies = [
+ "uuid",
+]
 
 [[package]]
 name = "matrix-web-service"
@@ -1763,6 +1769,12 @@ name = "urlencoding"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68b90931029ab9b034b300b797048cf23723400aa757e8a2bfb9d748102f9821"
+
+[[package]]
+name = "uuid"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
 
 [[package]]
 name = "vcpkg"

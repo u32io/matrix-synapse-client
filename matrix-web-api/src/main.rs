@@ -2,8 +2,8 @@ use std::convert::TryFrom;
 use std::path::Path;
 use actix_web::{web, App, HttpServer};
 use actix_web::client::Client;
-use matrix_gateway::controller;
 use matrix_http_client::{ApiUriBuilder, MatrixClient, ClientConfig};
+use matrix_web_api::controller;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
