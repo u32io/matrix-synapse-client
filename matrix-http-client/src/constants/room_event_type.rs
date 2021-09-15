@@ -1,8 +1,7 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-pub enum RoomEventType
-{
+pub enum RoomEventType {
     #[serde(rename = "m.room.message")]
     Message,
     #[serde(rename = "m.room.canonical_alias")]
@@ -25,8 +24,7 @@ pub enum RoomEventType
     Other,
 }
 
-impl RoomEventType
-{
+impl RoomEventType {
     /* TODO:
     #[serde(rename = "m.room.canonical_alias")]
     #[serde(rename = "m.room.create")]
@@ -39,10 +37,8 @@ impl RoomEventType
     */
     const MESSAGE: &'static str = "m.room.message";
 
-    pub fn as_str(&self) -> &str
-    {
-        match self
-        {
+    pub fn as_str(&self) -> &str {
+        match self {
             Self::Message => Self::MESSAGE,
             _ => "",
         }

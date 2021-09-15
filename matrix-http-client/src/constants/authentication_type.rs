@@ -1,8 +1,7 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub enum AuthenticationType
-{
+pub enum AuthenticationType {
     #[serde(rename = "m.login.password")]
     Password,
     #[serde(rename = "m.login.recaptcha")]
@@ -20,5 +19,5 @@ pub enum AuthenticationType
     #[serde(rename = "m.login.dummy")]
     Dummy,
     #[serde(other)]
-    Other
+    Other,
 }

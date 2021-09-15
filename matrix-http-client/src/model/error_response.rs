@@ -1,10 +1,9 @@
-use serde::{Deserialize};
-use super::{ErrorCode};
+use super::ErrorCode;
+use serde::Deserialize;
 
 /// Any errors which occur at the Matrix API level MUST return a "standard error response".
 #[derive(Deserialize)]
-pub struct ErrorResponse
-{
+pub struct ErrorResponse {
     #[serde(rename = "errcode")]
     pub code: ErrorCode,
     #[serde(rename = "error")]
@@ -12,13 +11,11 @@ pub struct ErrorResponse
 }
 
 #[cfg(test)]
-mod test
-{
+mod test {
     use super::*;
 
     #[test]
-    fn error_message_deserializes_from_json() -> ()
-    {
+    fn error_message_deserializes_from_json() -> () {
         let json = "{
             \"errcode\": \"M_FORBIDDEN\",
             \"error\": \"Forbidden access, e.g. joining a room without permission, failed login\"

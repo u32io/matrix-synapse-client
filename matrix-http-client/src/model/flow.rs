@@ -1,29 +1,25 @@
 use crate::constants::AuthenticationType;
 
-use serde::{Deserialize};
+use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-pub struct Flow
-{
+pub struct Flow {
     #[serde(rename = "type")]
     pub authentication_type: AuthenticationType,
 }
 
 #[derive(Deserialize)]
-pub struct FlowCollection
-{
+pub struct FlowCollection {
     pub flows: Vec<Flow>,
 }
 
 #[cfg(test)]
-mod test
-{
-    use super::Flow;
+mod test {
     use super::AuthenticationType;
+    use super::Flow;
 
     #[test]
-    fn flow_deserializes_from_json()
-    {
+    fn flow_deserializes_from_json() {
         let json = "
         {
             \"type\": \"m.login.password\"

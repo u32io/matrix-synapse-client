@@ -1,24 +1,23 @@
-pub use error_code::ErrorCode as ErrorCode;
+pub use error_code::ErrorCode;
 // Models
-pub use error_response::ErrorResponse as ErrorResponse;
-pub use event_response::EventResponse as EventResponse;
-pub use flow::Flow as Flow;
-pub use flow::FlowCollection as FlowCollection;
-pub use login_request::LoginIdentifier as LoginIdentifier;
-pub use login_request::LoginRequest as LoginRequest;
-pub use login_response::LoginResponse as LoginResponse;
-pub use message_request::MessageRequest as MessageRequest;
+pub use error_response::ErrorResponse;
+pub use event_response::EventResponse;
+pub use flow::Flow;
+pub use flow::FlowCollection;
+pub use login_request::LoginIdentifier;
+pub use login_request::LoginRequest;
+pub use login_response::LoginResponse;
+pub use message_request::MessageRequest;
 
-mod flow;
-mod login_response;
-mod login_request;
-mod error_response;
 mod error_code;
+mod error_response;
 mod event_response;
+mod flow;
+mod login_request;
+mod login_response;
 mod message_request;
 
-pub enum ErrorKind
-{
+pub enum ErrorKind {
     InvalidScheme,
     InvalidAuthenticationType,
 }

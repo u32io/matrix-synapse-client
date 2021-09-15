@@ -1,8 +1,7 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub enum ErrorCode
-{
+pub enum ErrorCode {
     #[serde(rename = "M_FORBIDDEN")]
     Forbidden,
     #[serde(rename = "M_UNKNOWN_TOKEN")]
@@ -69,16 +68,14 @@ pub enum ErrorCode
     CannotLeaveServiceNoticeRoom,
 }
 
-impl ToString for ErrorCode
-{
+impl ToString for ErrorCode {
     fn to_string(&self) -> String {
         // TODO: this doesn't need serde. Instead called self.as_str().to_string()
         serde_json::to_string(self).unwrap()
     }
 }
 
-impl ErrorCode
-{
+impl ErrorCode {
     pub fn as_str(&self) -> &str {
         // TODO: this can be made more efficient with some constants & a match block
         todo!()

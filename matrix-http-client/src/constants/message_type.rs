@@ -1,8 +1,7 @@
-use serde::{Serialize};
+use serde::Serialize;
 
 #[derive(Serialize)]
-pub enum MessageType
-{
+pub enum MessageType {
     #[serde(rename = "m.text")]
     Text,
     #[serde(rename = "m.emote")]
