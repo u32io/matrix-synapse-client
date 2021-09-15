@@ -117,6 +117,7 @@ mod test {
     use actix_web::client::Client;
     use std::convert::TryFrom;
     use std::path::Path;
+    use crate::ClientConfig;
 
     fn init_matrix_client() -> MatrixClient {
         let config = ClientConfig::try_from(Path::new(".client.json")).unwrap();

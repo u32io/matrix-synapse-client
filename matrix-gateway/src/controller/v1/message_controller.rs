@@ -1,7 +1,7 @@
 use actix_web::{post, web, Responder};
 use crate::model::BasicMessage;
 use actix_web::web::{Json, Data};
-use crate::client::MatrixClient;
+use matrix_http_client::MatrixClient;
 
 pub fn init(cfg: &mut web::ServiceConfig)
 {

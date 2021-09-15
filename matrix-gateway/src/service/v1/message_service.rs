@@ -1,6 +1,6 @@
-use crate::client::{MatrixClient, MatrixClientError};
 use crate::model::BasicMessage;
 use std::rc::Rc;
+use matrix_http_client::{MatrixClient, MatrixClientError};
 
 pub struct MessageService
 {
@@ -18,6 +18,6 @@ impl MessageService
 
     pub fn send(&self, msg: BasicMessage) -> Result<(),MatrixClientError>
     {
-
+        todo!()
     }
 }
