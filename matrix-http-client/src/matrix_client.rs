@@ -3,21 +3,13 @@ use super::model::{
     ErrorResponse, EventResponse, FlowCollection, LoginRequest, LoginResponse, MessageRequest,
 };
 use super::ApiUriBuilder;
-use actix_web::client::{Client, PayloadError, SendRequestError};
+use actix_web::client::{Client};
 use actix_web::http::StatusCode;
 use urlencoding::Encoded;
 use std::future::Future;
 use std::pin::Pin;
 use crate::TMatrixClient;
-
-// TODO: implement std::error::Error on this type
-pub enum MatrixClientError {
-    SendRequestError(SendRequestError),
-    PayloadErr(PayloadError),
-    JsonDeserializationError(serde_json::Error),
-    HttpResponseError(StatusCode, ErrorResponse),
-    Unknown,
-}
+use crate::error::{MatrixClientError, HttpResponseError};
 
 /// A template for building `GET` requests and mapping their `Err` to `MatrixClientErr`
 macro_rules! http_get {
@@ -59,10 +51,10 @@ macro_rules! try_convert_200 {
     ($http_response:expr, $model:ty) => {
         match $http_response.status() {
             StatusCode::OK => Ok(get_json!($model, $http_response)?),
-            _ => Err(MatrixClientError::HttpResponseError(
-                $http_response.status(),
-                get_json!(ErrorResponse, $http_response)?,
-            )),
+            _ => Err(MatrixClientError::HttpResponseError(HttpResponseError {
+                status: $http_response.status(),
+                body: get_json!(ErrorResponse, $http_response)?,
+            })),
         }
     };
 }
