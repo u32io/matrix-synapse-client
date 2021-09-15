@@ -1,5 +1,5 @@
 [package]
-name = "matrix-gateway"
+name = "matrix-web-api"
 version = "0.1.0"
 authors = ["james.meyer"]
 edition = "2018"

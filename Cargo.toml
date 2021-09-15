@@ -1,5 +1,9 @@
 [workspace]
 members = [
     "matrix-http-client",
-    "matrix-gateway",
+    "matrix-web-dto",
+    "matrix-web-entity",
+    "matrix-web-dao",
+    "matrix-web-service",
+    "matrix-web-api",
 ]

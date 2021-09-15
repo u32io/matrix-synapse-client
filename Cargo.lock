@@ -898,7 +898,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3e378b66a060d48947b590737b30a1be76706c8dd7b8ba0f2fe3989c68a853f"
 
 [[package]]
-name = "matrix-gateway"
+name = "matrix-http-client"
+version = "0.1.0"
+dependencies = [
+ "actix-rt",
+ "actix-web",
+ "openssl",
+ "serde",
+ "serde_json",
+ "urlencoding",
+]
+
+[[package]]
+name = "matrix-web-api"
 version = "0.1.0"
 dependencies = [
  "actix-rt",
@@ -911,16 +923,20 @@ dependencies = [
 ]
 
 [[package]]
-name = "matrix-http-client"
+name = "matrix-web-dao"
 version = "0.1.0"
-dependencies = [
- "actix-rt",
- "actix-web",
- "openssl",
- "serde",
- "serde_json",
- "urlencoding",
-]
+
+[[package]]
+name = "matrix-web-dto"
+version = "0.1.0"
+
+[[package]]
+name = "matrix-web-entity"
+version = "0.1.0"
+
+[[package]]
+name = "matrix-web-service"
+version = "0.1.0"
 
 [[package]]
 name = "memchr"
