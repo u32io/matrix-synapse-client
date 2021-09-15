@@ -1,14 +1,12 @@
 use std::convert::TryFrom;
 use std::path::Path;
 use actix_web::{web, App, HttpServer};
-use matrix_gateway::client::{ClientConfig, ApiUriBuilder, MatrixClient};
+//use matrix_gateway::client::{ClientConfig, ApiUriBuilder, MatrixClient};
 use actix_web::client::Client;
 use matrix_gateway::controller;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-
-    //let matrix_client = web::Data::new(matrix_client);
 
     let server = HttpServer::new(|| {
         let client_config = ClientConfig::try_from(Path::new(".client.json"))
@@ -21,7 +19,7 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .data(matrix_client)
-            .service(web::scope("/matrix/v1/").configure(controller::v1::init_message_controller)
+            .service(web::scope("/matrix/message/v1").configure(controller::v1::init_message_controller)
         )
     });
 

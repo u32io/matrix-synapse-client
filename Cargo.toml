@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "matrix-http-client",
+    "matrix-gateway",
+]
