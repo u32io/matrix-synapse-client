@@ -6,6 +6,9 @@ use super::ApiUriBuilder;
 use actix_web::client::{Client, PayloadError, SendRequestError};
 use actix_web::http::StatusCode;
 use urlencoding::Encoded;
+use std::future::Future;
+use std::pin::Pin;
+use crate::TMatrixClient;
 
 // TODO: implement std::error::Error on this type
 pub enum MatrixClientError {
@@ -16,10 +19,6 @@ pub enum MatrixClientError {
     Unknown,
 }
 
-pub struct MatrixClient {
-    api_uri: ApiUriBuilder,
-    http_client: Client,
-}
 /// A template for building `GET` requests and mapping their `Err` to `MatrixClientErr`
 macro_rules! http_get {
     ($http_client:expr, $uri:expr) => {
@@ -68,26 +67,30 @@ macro_rules! try_convert_200 {
     };
 }
 
+pub struct MatrixClient {
+    internal: InternalMatrixClient,
+}
+
 impl MatrixClient {
     pub fn new(api_uri: ApiUriBuilder, http_client: Client) -> Self {
         Self {
-            api_uri,
-            http_client,
+            internal: InternalMatrixClient {
+                api_uri,
+                http_client,
+            }
         }
     }
+}
 
+impl TMatrixClient for MatrixClient {
     /// `GET` the authentication scheme of the matrix-synapse API
-    pub async fn get_login(&self) -> Result<FlowCollection, MatrixClientError> {
-        let mut response = http_get!(self.http_client, self.api_uri.login())?;
-        try_convert_200!(response, FlowCollection)
+    fn get_login<'req>(&'req self) -> Pin<Box<dyn Future<Output=Result<FlowCollection,MatrixClientError>> + 'req>> {
+        Box::pin(self.internal.get_login())
     }
-
     /// `POST` the credentials of a user and expect a `200` response with an access token
-    pub async fn post_login(&self, req: &LoginRequest) -> Result<LoginResponse, MatrixClientError> {
-        let mut response = http_post!(self.http_client, self.api_uri.login(), req)?;
-        try_convert_200!(response, LoginResponse)
+    fn post_login<'req>(&'req self, req: &'req LoginRequest) -> Pin<Box<dyn Future<Output=Result<LoginResponse, MatrixClientError>> + 'req>> {
+        Box::pin(self.internal.post_login(req))
     }
-
     /// `POST` a basic message and expect and expect a response that contains an event id
     /// ```bash
     /// curl -XPOST -d '{"msgtype":"m.text", "body":"hello"}' \
@@ -95,7 +98,40 @@ impl MatrixClient {
     ///
     /// { "event_id": "EVENT ID" }
     /// ```
-    pub async fn post_message(
+    fn post_message<'req>(
+        &'req self,
+        msg: &'req MessageRequest,
+        room_id: Encoded<&'req str>,
+        access_token: &'req str
+    ) -> Pin<Box<dyn Future<Output=Result<EventResponse, MatrixClientError>> + 'req>> {
+        Box::pin(self.internal.post_message(msg, room_id, access_token))
+    }
+}
+
+struct InternalMatrixClient {
+    api_uri: ApiUriBuilder,
+    http_client: Client,
+}
+
+impl InternalMatrixClient {
+    /// `GET` the authentication scheme of the matrix-synapse API
+    async fn get_login(&self) -> Result<FlowCollection, MatrixClientError> {
+        let mut response = http_get!(self.http_client, self.api_uri.login())?;
+        try_convert_200!(response, FlowCollection)
+    }
+    /// `POST` the credentials of a user and expect a `200` response with an access token
+    async fn post_login(&self, req: &LoginRequest) -> Result<LoginResponse, MatrixClientError> {
+        let mut response = http_post!(self.http_client, self.api_uri.login(), req)?;
+        try_convert_200!(response, LoginResponse)
+    }
+    /// `POST` a basic message and expect and expect a response that contains an event id
+    /// ```bash
+    /// curl -XPOST -d '{"msgtype":"m.text", "body":"hello"}' \
+    ///     "https://API/send/m.room.message?access_token=YOUR_ACCESS_TOKEN"
+    ///
+    /// { "event_id": "EVENT ID" }
+    /// ```
+    async fn post_message(
         &self,
         msg: &MessageRequest,
         room_id: Encoded<&str>,
