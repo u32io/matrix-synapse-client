@@ -168,4 +168,31 @@ mod test {
 
         assert_eq!(StatusCode::BAD_REQUEST, err);
     }
+
+    #[actix_rt::test]
+    async fn matrix_client_returns_403_when_credentials_are_invalid(){
+        let matrix = init_matrix_client();
+
+        let req = LoginRequest {
+            auth_type: AuthenticationType::Password,
+            identifier: LoginIdentifier {
+                id_type: IdentifierType::User,
+                user: "non_user".to_string(),
+            },
+            password: "password123".to_string(),
+        };
+
+        let resp = matrix.post_login(&req).await;
+
+        assert!(resp.is_err());
+        let err = match resp.unwrap_err() {
+            MatrixClientError::HttpResponseError(status, _msg) => {
+                println!("{:?}", _msg);
+                status
+            },
+            _ => panic!(),
+        };
+
+        assert_eq!(StatusCode::FORBIDDEN, err);
+    }
 }
