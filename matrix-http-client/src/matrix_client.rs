@@ -118,6 +118,8 @@ mod test {
     use std::convert::TryFrom;
     use std::path::Path;
     use crate::ClientConfig;
+    use crate::constants::{AuthenticationType, IdentifierType};
+    use crate::model::LoginIdentifier;
 
     fn init_matrix_client() -> MatrixClient {
         let config = ClientConfig::try_from(Path::new(".client.json")).unwrap();
@@ -138,5 +140,32 @@ mod test {
 
         let flow = flow.ok().unwrap().flows;
         assert!(flow.len() >= 1);
+    }
+
+    #[actix_rt::test]
+    async fn matrix_client_returns_400_when_flow_is_invalid(){
+        let matrix = init_matrix_client();
+
+        let req = LoginRequest {
+            auth_type: AuthenticationType::Dummy,
+            identifier: LoginIdentifier {
+                id_type: IdentifierType::ThirdParty,
+                user: "non_user".to_string(),
+            },
+            password: "password123".to_string(),
+        };
+
+        let resp = matrix.post_login(&req).await;
+
+        assert!(resp.is_err());
+        let err = match resp.unwrap_err() {
+            MatrixClientError::HttpResponseError(status, _msg) => {
+                println!("{:?}", _msg);
+                status
+            },
+            _ => panic!(),
+        };
+
+        assert_eq!(StatusCode::BAD_REQUEST, err);
     }
 }

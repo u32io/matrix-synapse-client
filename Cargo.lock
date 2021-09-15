@@ -943,6 +943,9 @@ dependencies = [
 [[package]]
 name = "matrix-web-service"
 version = "0.1.0"
+dependencies = [
+ "matrix-http-client",
+]
 
 [[package]]
 name = "memchr"

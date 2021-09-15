@@ -2,7 +2,7 @@ use super::ErrorCode;
 use serde::Deserialize;
 
 /// Any errors which occur at the Matrix API level MUST return a "standard error response".
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct ErrorResponse {
     #[serde(rename = "errcode")]
     pub code: ErrorCode,
