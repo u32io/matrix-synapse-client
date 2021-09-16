@@ -148,6 +148,7 @@ mod test {
     use crate::ClientConfig;
     use crate::constants::{AuthenticationType, IdentifierType};
     use crate::model::LoginIdentifier;
+    use crate::abstraction::GetError;
 
     fn init_matrix_client() -> MatrixClient {
         let config = ClientConfig::try_from(Path::new(".client.json")).unwrap();
@@ -186,15 +187,10 @@ mod test {
         let resp = matrix.post_login(&req).await;
 
         assert!(resp.is_err());
-        let err = match resp.unwrap_err() {
-            MatrixClientError::HttpResponseError(status, _msg) => {
-                println!("{:?}", _msg);
-                status
-            },
-            _ => panic!(),
-        };
+        let err = resp.unwrap_err();
+        let err = err.get_error().unwrap();
 
-        assert_eq!(StatusCode::BAD_REQUEST, err);
+        assert_eq!(StatusCode::BAD_REQUEST, err.status);
     }
 
     #[actix_rt::test]
@@ -213,14 +209,9 @@ mod test {
         let resp = matrix.post_login(&req).await;
 
         assert!(resp.is_err());
-        let err = match resp.unwrap_err() {
-            MatrixClientError::HttpResponseError(status, _msg) => {
-                println!("{:?}", _msg);
-                status
-            },
-            _ => panic!(),
-        };
+        let err = resp.unwrap_err();
+        let err = err.get_error().unwrap();
 
-        assert_eq!(StatusCode::FORBIDDEN, err);
+        assert_eq!(StatusCode::FORBIDDEN, err.status);
     }
 }
