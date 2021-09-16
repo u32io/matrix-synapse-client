@@ -1,11 +1,12 @@
 mod api_uri_builder;
 mod client_config;
-mod constants;
 mod matrix_client;
-mod model;
 mod text_message;
-mod abstraction;
-mod error;
+
+pub mod abstraction;
+pub mod model;
+pub mod error;
+pub mod constants;
 
 pub use abstraction::TMatrixClient;
 pub use api_uri_builder::ApiUriBuilder;
