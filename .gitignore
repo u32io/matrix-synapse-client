@@ -5,4 +5,4 @@
 target/
 
 # matrix-web-*
-.client.json
+.*.json
