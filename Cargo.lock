@@ -903,6 +903,7 @@ version = "0.1.0"
 dependencies = [
  "actix-rt",
  "actix-web",
+ "matrix-web-util",
  "openssl",
  "serde",
  "serde_json",
@@ -945,6 +946,18 @@ name = "matrix-web-service"
 version = "0.1.0"
 dependencies = [
  "matrix-http-client",
+]
+
+[[package]]
+name = "matrix-web-test-util"
+version = "0.1.0"
+
+[[package]]
+name = "matrix-web-util"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

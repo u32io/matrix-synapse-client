@@ -1,7 +1,7 @@
 use crate::constants::{AuthenticationType, IdentifierType};
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct LoginRequest {
     #[serde(rename = "type")]
     pub auth_type: AuthenticationType,
@@ -9,7 +9,7 @@ pub struct LoginRequest {
     pub password: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct LoginIdentifier {
     #[serde(rename = "type")]
     pub id_type: IdentifierType,
