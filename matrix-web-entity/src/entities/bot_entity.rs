@@ -6,4 +6,5 @@ pub struct BotEntity {
     pub bot_id: Uuid,
     pub name: String,
     pub home_sever: String,
+    pub password: String,
 }
